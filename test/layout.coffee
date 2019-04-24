@@ -3,21 +3,65 @@ theme = require '../lib/main'
 
 describe 'Layout', ->
   it 'Should include API title & description', (done) ->
-    ast =
-      name: 'Test API'
-      description: 'I am a [test](http://test.com/) API.'
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes: {
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
+              ]
+            }
+            title:
+              element: 'string'
+              content: 'Test API'
+          content: [
+            {
+              element: 'copy'
+              content: 'I am a [test](http://test.com/) API.'
+            }
+          ]
+        }
+      ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, 'Test API'
       assert.include html, 'I am a <a href="http://test.com/">test</a> API.'
       done()
 
   it 'Should render custom code in markdown', (done) ->
-    ast =
-      description: 'Test\n\n```coffee\na = 1\n```\n'
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes: {
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
+              ]
+            }
+          content: [
+            {
+              element: 'copy'
+              content: 'Test\n\n```coffee\na = 1\n```\n'
+            }
+          ]
+        }
+      ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, 'a = <span class="hljs-number">1</span>'
       done()

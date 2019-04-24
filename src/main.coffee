@@ -347,6 +347,24 @@ getDataStructures = (parseResult) ->
   return new -> @[result.content.meta.id.content] = result \
       for result in results; @
 
+getApiDescription = (parseResult) ->
+  [category, ...] = query parseResult, {
+    element: 'category',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'api'
+          }
+        ]
+      }
+    },
+  }
+  if category?.content.length > 0
+    content = category.content[0]
+    return content.content if content.element == 'copy'
+  return ''
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -364,9 +382,8 @@ decorate = (api, md, slugCache, verbose) ->
   if verbose
     console.log "Known data structures: #{Object.keys(dataStructures)}"
 
-  # API overview description
-  if api.description
-    api.descriptionHtml = md.render api.description
+  api.descriptionHtml = md.render getApiDescription api
+  if api.descriptionHtml
     api.navItems = slugCache._nav
     slugCache._nav = []
 
