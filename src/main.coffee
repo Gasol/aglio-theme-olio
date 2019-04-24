@@ -333,6 +333,20 @@ getTitle = (parseResult) ->
   }
   return category?.meta.title?.content or ''
 
+getDataStructures = (parseResult) ->
+  results = query parseResult, {
+    element: 'dataStructure',
+    content: {
+      meta: {
+        id: {
+          element: 'string'
+        }
+      }
+    }
+  }
+  return new -> @[result.content.meta.id.content] = result \
+      for result in results; @
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -346,12 +360,7 @@ decorate = (api, md, slugCache, verbose) ->
   # TODO: Remove me when Drafter is released.
   api.name = getTitle api
 
-  dataStructures = {}
-  for category in api.content or []
-    for item in category.content or []
-      if item.element is 'dataStructure'
-        dataStructure = item.content[0]
-        dataStructures[dataStructure.meta.id] = dataStructure
+  dataStructures = getDataStructures api
   if verbose
     console.log "Known data structures: #{Object.keys(dataStructures)}"
 
