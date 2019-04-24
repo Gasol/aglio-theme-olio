@@ -8,6 +8,7 @@ moment = require 'moment'
 path = require 'path'
 querystring = require 'querystring'
 
+query = require '@gasolwu/refract-query'
 renderExample = require './example'
 renderSchema = require './schema'
 
@@ -317,6 +318,21 @@ modifyUriTemplate = (templateUri, parameters, colorize) ->
     uri
   , []).join('').replace(/\/+/g, '/')
 
+getTitle = (parseResult) ->
+  [category, ...] = query parseResult, {
+    element: 'category',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'api'
+          }
+        ]
+      }
+    }
+  }
+  return category?.meta.title?.content or ''
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -328,6 +344,8 @@ decorate = (api, md, slugCache, verbose) ->
   # Find data structures. This is a temporary workaround until Drafter is
   # updated to support JSON Schema again.
   # TODO: Remove me when Drafter is released.
+  api.name = getTitle api
+
   dataStructures = {}
   for category in api.content or []
     for item in category.content or []
