@@ -2,6 +2,13 @@
 # yarn lockfile v1
 
 
+"@gasolwu/refract-query@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@gasolwu/refract-query/-/refract-query-0.1.3.tgz#9491dda02661928724ad51252ea312f7ea836bd1"
+  integrity sha512-cx69J4SWhoHKqKeDayewaVXxqFi3DBKAEDJSr4pCURfRnFqhZ4PI7j1lL4L+P8LwwtsC4F9+fAh8JBRWFqm1iw==
+  dependencies:
+    lodash "^4.17.11"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -869,6 +876,11 @@ linkify-it@~1.2.0:
   integrity sha1-B3NSbDF8j9E71TTuHRgP+Iq/iBo=
   dependencies:
     uc.micro "^1.0.1"
+
+lodash@^4.17.11:
+  version "4.17.11"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
+  integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
 
 log-driver@1.2.5:
   version "1.2.5"
