@@ -365,6 +365,30 @@ getApiDescription = (parseResult) ->
     return content.content if content.element == 'copy'
   return ''
 
+getHost = (parseResult) ->
+  [category, ...] = query parseResult, {
+    element: 'category',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'api'
+          }
+        ]
+      }
+    }
+  }
+
+  [member, ...] = query category?.attributes?.metadata or [], {
+    element: 'member'
+    content: {
+      key: {
+        content: 'HOST'
+      }
+    }
+  }
+  return member?.content.value.content or ''
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -387,9 +411,7 @@ decorate = (api, md, slugCache, verbose) ->
     api.navItems = slugCache._nav
     slugCache._nav = []
 
-  for meta in api.metadata or []
-    if meta.name is 'HOST'
-      api.host = meta.value
+  api.host = getHost api
 
   for resourceGroup in api.resourceGroups or []
     # Element ID and link
