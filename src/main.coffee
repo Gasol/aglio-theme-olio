@@ -422,7 +422,27 @@ getResourceGroup = (resourceGroupElement, slugCache, md) ->
   if description
     resourceGroup.navItems = slugCache._nav
     slugCache._nav = []
+
+  resourceGroup.resources = getResources resourceGroupElement,
+    slugCache, resourceGroup
   return resourceGroup
+
+getResources = (resourceGroupElement, slugCache, resourceGroup) ->
+  slugify = slug.bind slug, slugCache
+  resources = []
+  for resourceElement in query resourceGroupElement, {element: 'resource'}
+    title = resourceElement.meta.title.content
+    title_slug = slugify "#{resourceGroup.elementId}-#{title}", true
+    [description, ...] = query resourceElement, {element: 'copy'}
+    resource = {
+      name: title
+      elementId: title_slug
+      elementLink: "##{title_slug}"
+      description: description?.content or ''
+      actions: []
+    }
+    resources.push resource
+  return resources
 
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
@@ -451,11 +471,6 @@ decorate = (api, md, slugCache, verbose) ->
   api.resourceGroups = getResourceGroups api, slugCache, md
   for resourceGroup in api.resourceGroups or []
     for resource in resourceGroup.resources or []
-      # Element ID and link
-      resource.elementId = slugify(
-        "#{resourceGroup.name}-#{resource.name}", true)
-      resource.elementLink = "##{resource.elementId}"
-
       for action in resource.actions or []
         # Element ID and link
         action.elementId = slugify(
