@@ -441,8 +441,37 @@ getResources = (resourceGroupElement, slugCache, resourceGroup) ->
       description: description?.content or ''
       actions: []
     }
+    resource.actions = getActions resourceElement, slugCache,
+      resourceGroup, resource
     resources.push resource
   return resources
+
+getActions = (resourceElement, slugCache, resourceGroup, resource) ->
+  slugify = slug.bind slug, slugCache
+  actions = []
+  for actionElement in query resourceElement, {element: 'transition'}
+    title = actionElement.meta.title.content
+    method = ''
+    hasRequest = false
+    for requestElement in query actionElement, {element: 'httpRequest'}
+      hasRequest = true
+      method = requestElement.attributes.method.content
+
+    [..., copy] = query actionElement, {element: 'copy'}
+    id = slugify "#{resourceGroup.elementId}-#{resource.name}-#{method}",
+      true
+    action = {
+      name: title
+      description: copy?.content
+      elementId: id
+      elementLink: "##{id}"
+      method: method
+      methodLower: method.toLowerCase()
+      hasRequest: hasRequest
+    }
+    actions.push action
+
+  return actions
 
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
@@ -472,14 +501,6 @@ decorate = (api, md, slugCache, verbose) ->
   for resourceGroup in api.resourceGroups or []
     for resource in resourceGroup.resources or []
       for action in resource.actions or []
-        # Element ID and link
-        action.elementId = slugify(
-          "#{resourceGroup.name}-#{resource.name}-#{action.method}", true)
-        action.elementLink = "##{action.elementId}"
-
-        # Lowercase HTTP method name
-        action.methodLower = action.method.toLowerCase()
-
         # Parameters may be defined on the action or on the
         # parent resource. Resource parameters should be concatenated
         # to the action-specific parameters if set.
