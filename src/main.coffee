@@ -389,6 +389,41 @@ getHost = (parseResult) ->
   }
   return member?.content.value.content or ''
 
+getResourceGroups = (parseResult, slugCache, md) ->
+  results = query parseResult, {
+    element: 'category',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'resourceGroup'
+          }
+        ]
+      }
+    }
+  }
+  return (getResourceGroup result, slugCache, md for result in results)
+
+getResourceGroup = (resourceGroupElement, slugCache, md) ->
+  slugify = slug.bind slug, slugCache
+  title = resourceGroupElement.meta.title.content
+  title_slug = slugify title, true
+  if resourceGroupElement.content.length > 0 and
+      resourceGroupElement.content[0].element == 'copy'
+    description = md.render resourceGroupElement.content[0].content
+
+  resourceGroup = {
+    name: title
+    elementId: title_slug
+    elementLink: "##{title_slug}"
+    descriptionHtml: description or ''
+    resources: []
+  }
+  if description
+    resourceGroup.navItems = slugCache._nav
+    slugCache._nav = []
+  return resourceGroup
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -413,17 +448,8 @@ decorate = (api, md, slugCache, verbose) ->
 
   api.host = getHost api
 
+  api.resourceGroups = getResourceGroups api, slugCache, md
   for resourceGroup in api.resourceGroups or []
-    # Element ID and link
-    resourceGroup.elementId = slugify resourceGroup.name, true
-    resourceGroup.elementLink = "##{resourceGroup.elementId}"
-
-    # Description
-    if resourceGroup.description
-      resourceGroup.descriptionHtml = md.render resourceGroup.description
-      resourceGroup.navItems = slugCache._nav
-      slugCache._nav = []
-
     for resource in resourceGroup.resources or []
       # Element ID and link
       resource.elementId = slugify(
