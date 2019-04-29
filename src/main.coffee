@@ -469,9 +469,40 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
       methodLower: method.toLowerCase()
       hasRequest: hasRequest
     }
+    action.parameters = getParameters actionElement, resourceElement
     actions.push action
 
   return actions
+
+getParameters = (actionElement, resourceElement) ->
+  parameters = []
+  hrefVariables = actionElement.attributes.hrefVariables or {content: []}
+  for hrefVariable in hrefVariables.content
+    requiredElement = query hrefVariable.attributes.typeAttributes, {
+      content: 'required'
+    }
+
+    valueElement = hrefVariable.content.value
+    switch valueElement.element
+      when 'enum'
+        values = ({value: enumValue.content} for enumValue in \
+          valueElement.attributes.enumerations.content)
+        example = valueElement.content.content
+      else
+        values = []
+        example = valueElement.content
+
+    parameter = {
+      name: hrefVariable.content.key.content
+      description: hrefVariable.meta.description?.content or ''
+      type: hrefVariable.meta.title?.content
+      required: requiredElement.length > 0
+      example: example
+      values: values
+    }
+    parameters.push parameter
+
+  return parameters
 
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
@@ -501,27 +532,6 @@ decorate = (api, md, slugCache, verbose) ->
   for resourceGroup in api.resourceGroups or []
     for resource in resourceGroup.resources or []
       for action in resource.actions or []
-        # Parameters may be defined on the action or on the
-        # parent resource. Resource parameters should be concatenated
-        # to the action-specific parameters if set.
-        if not (action.attributes or {}).uriTemplate
-          if not action.parameters or not action.parameters.length
-            action.parameters = resource.parameters
-          else if resource.parameters
-            action.parameters = resource.parameters.concat(action.parameters)
-
-        # Remove any duplicates! This gives precedence to the parameters
-        # defined on the action.
-        knownParams = {}
-        newParams = []
-        reversed = (action.parameters or []).concat([]).reverse()
-        for param in reversed
-          if knownParams[param.name] then continue
-          knownParams[param.name] = true
-          newParams.push param
-
-        action.parameters = newParams.reverse()
-
         # Set up the action's template URI
         action.uriTemplate = modifyUriTemplate(
           (action.attributes or {}).uriTemplate or resource.uriTemplate or '',
