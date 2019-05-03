@@ -469,7 +469,17 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
       methodLower: method.toLowerCase()
       hasRequest: hasRequest
     }
+
     action.parameters = getParameters actionElement, resourceElement
+
+    href = actionElement.attributes.href or resourceElement.attributes.href \
+      or {}
+    uriTemplate = href.content or ''
+    action.uriTemplate = modifyUriTemplate uriTemplate, action.parameters
+    action.colorizedUriTemplate = modifyUriTemplate uriTemplate,
+      action.parameters,
+      true
+
     actions.push action
 
   return actions
@@ -532,15 +542,6 @@ decorate = (api, md, slugCache, verbose) ->
   for resourceGroup in api.resourceGroups or []
     for resource in resourceGroup.resources or []
       for action in resource.actions or []
-        # Set up the action's template URI
-        action.uriTemplate = modifyUriTemplate(
-          (action.attributes or {}).uriTemplate or resource.uriTemplate or '',
-          action.parameters)
-
-        action.colorizedUriTemplate = modifyUriTemplate(
-          (action.attributes or {}).uriTemplate or resource.uriTemplate or '',
-          action.parameters, true)
-
         # Examples have a content section only if they have a
         # description, headers, body, or schema.
         action.hasRequest = false
