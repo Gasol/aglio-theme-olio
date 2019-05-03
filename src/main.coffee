@@ -7,7 +7,7 @@ markdownIt = require 'markdown-it'
 moment = require 'moment'
 path = require 'path'
 querystring = require 'querystring'
-
+equal = require 'deep-equal'
 query = require '@gasolwu/refract-query'
 renderExample = require './example'
 renderSchema = require './schema'
@@ -446,16 +446,167 @@ getResources = (resourceGroupElement, slugCache, resourceGroup) ->
     resources.push resource
   return resources
 
+getHeaders = (headersElement) ->
+  return ({
+    name: element.content.key.content
+    value: element.content.value.content
+  } for element in headersElement or [])
+
+getRequest = (requestElement) ->
+  hasRequest = requestElement.meta?.title or \
+    requestElement.content.length > 0
+  name = requestElement.meta?.title.content
+  method = requestElement.attributes.method.content
+
+  [copy] = query requestElement, {element: 'copy'}
+  [schema] = query requestElement, {
+    element: 'asset',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'messageBodySchema'
+          }
+        ]
+      }
+    }
+  }
+  [body] = query requestElement, {
+    element: 'asset',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'messageBody'
+          }
+        ]
+      }
+    }
+  }
+  headers = getHeaders requestElement.attributes.headers?.content
+
+  return {
+    name: name or ''
+    description: copy?.content or ''
+    schema: schema?.content or ''
+    body: body?.content or ''
+    headers: headers
+    content: []
+    method: method
+    hasContent: copy?.content? or \
+      headers.length > 0 or \
+      body?.content? or \
+      schema?.content?
+  }
+
+getResponse = (responseElement) ->
+  name = responseElement.attributes.statusCode.content
+  [schema] = query responseElement, {
+    element: 'asset',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'messageBodySchema'
+          }
+        ]
+      }
+    }
+  }
+  [body] = query responseElement, {
+    element: 'asset',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'messageBody'
+          }
+        ]
+      }
+    }
+  }
+  [copy] = query responseElement, {element: 'copy'}
+  headers = getHeaders responseElement.attributes.headers?.content
+
+  return {
+    name: name or ''
+    description: copy?.content or ''
+    headers: headers
+    body: body?.content or ''
+    schema: schema?.content or ''
+    content: []
+    hasContent: copy?.content? or \
+      headers.length > 0 or \
+      body?.content? or \
+      schema?.content?
+  }
+
+isEmptyMessage = (message) ->
+  return message.name? and
+    message.headers.length == 0 and
+    message.description? and
+    message.body? and
+    message.schema? and
+    message.content.length == 0
+
+getExamples = (actionElement) ->
+  example = {
+    name: ''
+    description: ''
+    requests: []
+    responses: []
+  }
+  examples = [example]
+
+  for httpTransaction in query actionElement, {element: 'httpTransaction'}
+    for requestElement in query httpTransaction, {element: 'httpRequest'}
+      request = getRequest requestElement
+      method = request.method
+    for responseElement in query httpTransaction, {element: 'httpResponse'}
+      response = getResponse responseElement
+
+    [..., prevRequest] = example?.requests or []
+    [..., prevResponse] = example?.responses or []
+    sameRequest = equal prevRequest, request
+    sameResponse = equal prevResponse, response
+    if sameRequest
+      if not sameResponse
+        example.responses.push response
+    else
+      if prevRequest
+        example = {
+          name: ''
+          description: ''
+          requests: []
+          responses: []
+        }
+        examples.push example
+      if not isEmptyMessage request
+        example.requests.push request
+      if not sameResponse
+        example.responses.push response
+
+  return examples
+
+getRequestMethod = (actionElement) ->
+  for requestElement in query actionElement, {element: 'httpRequest'}
+    method = requestElement.attributes.method.content
+    return method if method
+  return ''
+
 getActions = (resourceElement, slugCache, resourceGroup, resource) ->
   slugify = slug.bind slug, slugCache
   actions = []
+
   for actionElement in query resourceElement, {element: 'transition'}
     title = actionElement.meta.title.content
-    method = ''
-    hasRequest = false
-    for requestElement in query actionElement, {element: 'httpRequest'}
-      hasRequest = true
-      method = requestElement.attributes.method.content
+    console.log("Generating #{title} action")
+
+    method = getRequestMethod actionElement
+    examples = getExamples actionElement
+    for example in examples
+      hasRequest = example.requests.length > 0
+      break if hasRequest
 
     [..., copy] = query actionElement, {element: 'copy'}
     id = slugify "#{resourceGroup.elementId}-#{resource.name}-#{method}",
@@ -467,7 +618,8 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
       elementLink: "##{id}"
       method: method
       methodLower: method.toLowerCase()
-      hasRequest: hasRequest
+      hasRequest: hasRequest? or false
+      examples: examples
     }
 
     action.parameters = getParameters actionElement, resourceElement
@@ -537,64 +689,7 @@ decorate = (api, md, slugCache, verbose) ->
     slugCache._nav = []
 
   api.host = getHost api
-
   api.resourceGroups = getResourceGroups api, slugCache, md
-  for resourceGroup in api.resourceGroups or []
-    for resource in resourceGroup.resources or []
-      for action in resource.actions or []
-        # Examples have a content section only if they have a
-        # description, headers, body, or schema.
-        action.hasRequest = false
-        for example in action.examples or []
-          for name in ['requests', 'responses']
-            for item in example[name] or []
-              if name is 'requests' and not action.hasRequest
-                action.hasRequest = true
-
-              # If there is no schema, but there are MSON attributes, then try
-              # to generate the schema. This will fail sometimes.
-              # TODO: Remove me when Drafter is released.
-              if not item.schema and item.content
-                for dataStructure in item.content
-                  if dataStructure.element is 'dataStructure'
-                    try
-                      schema = renderSchema(
-                        dataStructure.content[0], dataStructures)
-                      schema['$schema'] =
-                        'http://json-schema.org/draft-04/schema#'
-                      item.schema = JSON.stringify(schema, null, 2)
-                    catch err
-                      if verbose
-                        console.log(
-                          JSON.stringify dataStructure.content[0], null, 2)
-                        console.log(err)
-
-              if not item.body and
-                  item.content and not process.env.DRAFTER_EXAMPLES
-                for dataStructure in item.content
-                  if dataStructure.element is 'dataStructure'
-                    try
-                      item.body = JSON.stringify(renderExample(
-                        dataStructure.content[0], dataStructures), null, 2)
-                    catch err
-                      if verbose
-                        console.log(
-                          JSON.stringify dataStructure.content[0], null, 2)
-                        console.log(err)
-
-              item.hasContent = item.description or \
-                                Object.keys(item.headers).length or \
-                                item.body or \
-                                item.schema
-
-              # If possible, make the body/schema pretty
-              try
-                if item.body
-                  item.body = JSON.stringify(JSON.parse(item.body), null, 2)
-                if item.schema
-                  item.schema = JSON.stringify(JSON.parse(item.schema), null, 2)
-              catch err
-                false
 
 # Get the theme's configuration, used by Aglio to present available
 # options and confirm that the input blueprint is a supported
