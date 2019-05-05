@@ -666,6 +666,24 @@ getParameters = (actionElement, resourceElement) ->
 
   return parameters
 
+getMetadata = (parseResult) ->
+  [category, ...] = query parseResult, {
+    element: 'category',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'api'
+          }
+        ]
+      }
+    }
+  }
+  return ({
+    name: meta.content.key.content
+    value: meta.content.value.content
+  } for meta in category?.attributes?.metadata?.content or [])
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -678,6 +696,7 @@ decorate = (api, md, slugCache, verbose) ->
   # updated to support JSON Schema again.
   # TODO: Remove me when Drafter is released.
   api.name = getTitle api
+  api.metadata = getMetadata api
 
   dataStructures = getDataStructures api
   if verbose
