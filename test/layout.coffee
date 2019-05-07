@@ -128,10 +128,31 @@ describe 'Layout', ->
       done()
 
   it 'Should generate unique header ids', (done) ->
-    ast =
-      description: '# Custom heading\n## Custom heading\n## Custom heading\n'
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes: {
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
+              ]
+            }
+          content: [
+            {
+              element: 'copy'
+              content: '# Custom heading\n## Custom heading\n## Custom heading\n'
+            }
+          ]
+        }
+      ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, '"header-custom-heading"'
       assert.include html, '"header-custom-heading-1"'
