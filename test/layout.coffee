@@ -97,10 +97,31 @@ describe 'Layout', ->
       done()
 
   it 'Should auto-link headings in markdown', (done) ->
-    ast =
-      description: '# Custom Heading'
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes: {
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
+              ]
+            }
+          content: [
+            {
+              element: 'copy'
+              content: '# Custom Heading'
+            }
+          ]
+        }
+      ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, '<h1 id="header-custom-heading"'
       assert.include html, '<a class="permalink" href="#header-custom-heading"'
