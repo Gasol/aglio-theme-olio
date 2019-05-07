@@ -67,10 +67,31 @@ describe 'Layout', ->
       done()
 
   it 'Should highlight unfenced code blocks', (done) ->
-    ast =
-      description: 'Test\n\n    var a = 1;\n'
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes: {
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
+              ]
+            }
+          content: [
+            {
+              element: 'copy'
+              content: 'Test\n\n    var a = 1;\n'
+            }
+          ]
+        }
+      ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, '<span class="hljs-number">1</span>'
       done()
