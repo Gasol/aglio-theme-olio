@@ -209,14 +209,49 @@ describe 'Layout', ->
       done()
 
   it 'Should include resource group name & description', (done) ->
-    ast =
-      resourceGroups: [
-        name: 'Frobs'
-        description: 'A list of *Frobs*'
-        resources: []
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes: {
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
+              ]
+            }
+          content: [
+            {
+              element: 'category'
+              meta:
+                classes: {
+                  element: 'array'
+                  content: [
+                    {
+                      element: 'string'
+                      content: 'resourceGroup'
+                    }
+                  ]
+                }
+                title:
+                  element: 'string'
+                  content: 'Frobs'
+              content: [
+                {
+                  element: 'copy'
+                  content: 'A list of <em>Frobs</em>'
+                }
+              ]
+            }
+          ]
+        }
       ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, 'Frobs'
       assert.include html, 'A list of <em>Frobs</em>'
