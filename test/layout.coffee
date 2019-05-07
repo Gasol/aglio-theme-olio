@@ -315,46 +315,167 @@ describe 'Layout', ->
       done()
 
   it 'Should include action information', (done) ->
-    ast =
-      resourceGroups: [
-        name: 'TestGroup'
-        resources: [
-          name: 'TestResource'
-          uriTemplate: '/resource/{idParam}{?param%2Dname*,param2Name}'
-          parameters: [
-            name: 'idParam'
-            description: 'Id parameter description'
-            values: []
-          ]
-          actions: [
-            name: 'Test Action',
-            description: 'Test *description*'
-            method: 'GET'
-            parameters: [
-              name: 'param-name'
-              description: 'Param *description*'
-              type: 'bool'
-              required: true
-              values: [
-                {value: 'test%2Dchoice'}
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes:
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
               ]
-            ]
-            examples: [
-              name: ''
-              description: ''
-              requests: [
-                name: '200'
-                headers: []
-                body: '{"error": true}'
-                schema: ''
+          content: [
+            {
+              element: 'category'
+              meta:
+                classes: {
+                  element: 'array'
+                  content: [
+                    {
+                      element: 'string'
+                      content: 'resourceGroup'
+                    }
+                  ]
+                }
+                title:
+                  element: 'string'
+                  content: 'TestGroup'
+              content: [
+                {
+                  element: 'resource'
+                  meta:
+                    title:
+                      element: 'string'
+                      content: 'TestResource'
+                  attributes:
+                    href:
+                      element: 'string'
+                      content: '/resource/{idParam}{?param%2Dname*}'
+                  content: [
+                    {
+                      element: 'transition'
+                      meta:
+                        title:
+                          element: 'string'
+                          content: 'Test Action'
+                      attributes:
+                        hrefVariables:
+                          element: 'hrefVariables'
+                          content: [
+                            {
+                              element: 'member',
+                              meta:
+                                description:
+                                  element: 'string'
+                                  content: 'Id parameter description'
+                              attributes:
+                                typeAttributes:
+                                  element: 'array'
+                                  content: [
+                                    {
+                                      element: 'string'
+                                      content: 'required'
+                                    }
+                                  ]
+                              content:
+                                key:
+                                  element: 'string'
+                                  content: 'idParam'
+                                value:
+                                  element: 'string'
+                            },
+                            {
+                              element: 'member',
+                              meta:
+                                title:
+                                  element: 'string'
+                                  content: 'boolean'
+                                description:
+                                  element: 'string'
+                                  content: 'Param *description*'
+                              attributes:
+                                typeAttributes:
+                                  element: 'array'
+                                  content: [
+                                    {
+                                      element: 'string'
+                                      content: 'required'
+                                    }
+                                  ]
+                              content:
+                                key:
+                                  element: 'string'
+                                  content: 'param-name'
+                                value:
+                                  element: 'enum'
+                                  attributes:
+                                    enumerations:
+                                      element: 'array'
+                                      content: [
+                                        {
+                                          element: 'string'
+                                          content: 'test%2Dchoice'
+                                        }
+                                      ]
+                                  content: 'test%2Dchoice'
+                            },
+                          ]
+                      content: [
+                        {
+                          element: 'copy'
+                          content: 'Test *description*'
+                        },
+                        {
+                          element: 'httpTransaction'
+                          content: [
+                            {
+                              element: 'httpRequest'
+                              attributes:
+                                method:
+                                  element: 'string'
+                                  content: 'GET'
+                              content: []
+                            },
+                            {
+                              element: 'httpResponse'
+                              attributes:
+                                statusCode:
+                                  element: 'string'
+                                  content: '200'
+                              content: [
+                                {
+                                  element: 'asset'
+                                  meta:
+                                    classes:
+                                      element: 'array'
+                                      content: [
+                                        {
+                                          element: 'string'
+                                          content: 'messageBody'
+                                        }
+                                      ]
+                                  content: '{"error": true}'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
               ]
-              responses: []
-            ]
+            }
           ]
-        ]
+        }
       ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, 'Test Action'
       assert.include html, 'Test <em>description</em>'
