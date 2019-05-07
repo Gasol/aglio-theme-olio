@@ -160,12 +160,50 @@ describe 'Layout', ->
       done()
 
   it 'Should include API hostname', (done) ->
-    ast =
-      metadata: [
-        {name: 'HOST', value: 'http://foo.com/'}
+    refract =
+      element: 'parseResult'
+      content: [
+        {
+          element: 'category'
+          meta:
+            classes: {
+              element: 'array'
+              content: [
+                {
+                  element: 'string'
+                  content: 'api'
+                }
+              ]
+            }
+          attributes:
+            metadata:
+              element: 'array'
+              content: [
+                {
+                  element: 'member'
+                  meta:
+                    classes:
+                      element: 'array'
+                      content: [
+                        {
+                          element: 'string'
+                          content: 'user'
+                        }
+                      ]
+                  content:
+                    key:
+                      element: 'string'
+                      content: 'HOST'
+                    value:
+                      element: 'string'
+                      content: 'http://foo.com/'
+                }
+              ]
+          content: []
+        }
       ]
 
-    theme.render ast, (err, html) ->
+    theme.render refract, (err, html) ->
       if err then return done err
       assert.include html, 'http://foo.com/'
       done()
