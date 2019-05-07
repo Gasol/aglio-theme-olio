@@ -5,5 +5,8 @@ node_js:
     - 8
     - 10
     - 12
+
+cache: yarn
+
 after_script:
     - npm run coveralls
