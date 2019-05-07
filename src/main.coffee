@@ -278,7 +278,7 @@ modifyUriTemplate = (templateUri, parameters, colorize) ->
   parameterNames = (param.name for param in parameters)
   parameterBlocks = []
   lastIndex = index = 0
-  while (index = templateUri.indexOf("{", index)) isnt - 1
+  while (index = templateUri.indexOf("{", index)) isnt -1
     parameterBlocks.push templateUri.substring(lastIndex, index)
     block = {}
     closeIndex = templateUri.indexOf("}", index)
