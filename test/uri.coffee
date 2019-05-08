@@ -130,33 +130,181 @@ addParameterDefaults = (example) ->
       defaultValue: parameter.defaultValue or ''
     }
 
-generateAST = (example) ->
-  example.ast =
-    resourceGroups: [
-      name: 'TestGroup'
-      resources: [
-        name: 'TestResource'
-        uriTemplate: example.uriTemplate
-        parameters: example.parameters
-        actions: [
-          name: 'Test Action',
-          description: 'Test *description*'
-          method: 'GET'
-          parameters: []
-          examples: [
-            name: ''
-            description: ''
-            requests: [
-              name: '200'
-              headers: []
-              body: ''
-              schema: ''
-            ]
-            responses: []
-          ]
-        ]
+generateRefract = (example) ->
+  hrefMembers = []
+  for param in example.parameters
+    if param.required
+      types = [
+        {
+          element: 'string'
+          content: 'required'
+        }
       ]
+
+    if param.values.length > 0
+      values = []
+      for value in param.values
+        values.push {
+          element: 'string'
+          content: value.value
+        }
+      valueContent =
+        element: 'enum'
+        attributes:
+          enumerations:
+            element: 'array'
+            content: values
+        content:
+          element: 'string'
+          content: param.example
+    else
+      valueContent =
+        element: 'string'
+        content: param.example
+
+    hrefMembers.push
+      element: 'member'
+      meta:
+        title:
+          element: 'string'
+          content: param.type
+        description:
+          element: 'string'
+          content: param.description
+      attributes:
+        typeAttributes:
+          element: 'array'
+          content: types or []
+      content:
+        key:
+          element: 'string'
+          content: param.name
+        value: valueContent
+
+  example.parseResult =
+    element: 'parseResult'
+    content: [
+      {
+        element: 'category'
+        meta:
+          classes: {
+            element: 'array'
+            content: [
+              {
+                element: 'string'
+                content: 'api'
+              }
+            ]
+          }
+          title:
+            element: 'string'
+            content: 'Test API'
+        content: [
+          {
+            element: 'category'
+            meta:
+              classes: {
+                element: 'array'
+                content: [
+                  {
+                    element: 'string'
+                    content: 'resourceGroup'
+                  }
+                ]
+              }
+              title:
+                element: 'string'
+                content: 'Frobs'
+            content: [
+              {
+                element: 'category'
+                meta:
+                  classes: {
+                    element: 'array'
+                    content: [
+                      {
+                        element: 'string'
+                        content: 'resourceGroup'
+                      }
+                    ]
+                  }
+                  title:
+                    element: 'string'
+                    content: 'TestGroup'
+                content: [
+                  {
+                    element: 'resource'
+                    meta:
+                      title:
+                        element: 'string'
+                        content: 'TestResource'
+                    attributes:
+                      href:
+                        element: 'string'
+                        content: example.uriTemplate
+                    content: [
+                      {
+                        element: 'transition'
+                        meta:
+                          title:
+                            element: 'string'
+                            content: 'Test Action'
+                        attributes:
+                          hrefVariables:
+                            element: 'hrefVariables'
+                            content: hrefMembers
+                        content: [
+                          {
+                            element: 'copy'
+                            content: 'Test *description*'
+                          },
+                          {
+                            element: 'httpTransaction'
+                            content: [
+                              {
+                                element: 'httpRequest'
+                                attributes:
+                                  method:
+                                    element: 'string'
+                                    content: 'GET'
+                                content: []
+                              },
+                              {
+                                element: 'httpResponse'
+                                attributes:
+                                  statusCode:
+                                    element: 'string'
+                                    content: '200'
+                                content: [
+                                  {
+                                    element: 'asset'
+                                    meta:
+                                      classes:
+                                        element: 'array'
+                                        content: [
+                                          {
+                                            element: 'string'
+                                            content: 'messageBody'
+                                          }
+                                        ]
+                                    content: '{"error": true}'
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
     ]
+
 
 createExampleURI = (example) ->
   exampleURI = ''
@@ -176,11 +324,11 @@ createExampleURI = (example) ->
 describe 'URI Rendering', ->
   examples.forEach (example) ->
     addParameterDefaults example
-    generateAST example
+    generateRefract example
     createExampleURI example
 
     it "Should render #{example.uriTemplate}", (done) ->
-      theme.render example.ast, (err, html) ->
+      theme.render example.parseResult, (err, html) ->
         if err then return done err
         assert.include html, example.uriTemplate.replace /&/g, '&amp;'
         assert.include html, example.exampleURI
