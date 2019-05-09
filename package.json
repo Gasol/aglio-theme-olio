@@ -38,7 +38,6 @@
     "coffee-script": "^1.8.0",
     "deep-equal": "^1.0.1",
     "highlight.js": "^8.4.0",
-    "jade": "^1.8.2",
     "less": "^2.1.2",
     "markdown-it": "^4.3.0",
     "markdown-it-anchor": "^2.1.0",
@@ -46,6 +45,7 @@
     "markdown-it-container": "^1.0.0",
     "markdown-it-emoji": "^1.0.0",
     "moment": "^2.8.4",
+    "pug": "^2.0.3",
     "stylus": "^0.51.1"
   },
   "devDependencies": {
