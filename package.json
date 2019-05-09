@@ -38,7 +38,7 @@
     "coffeescript": "^2.4.1",
     "deep-equal": "^1.0.1",
     "highlight.js": "^8.4.0",
-    "less": "^2.1.2",
+    "less": "^3.9.0",
     "markdown-it": "^4.3.0",
     "markdown-it-anchor": "^2.1.0",
     "markdown-it-checkbox": "^1.1.0",
