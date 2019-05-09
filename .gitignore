@@ -1,6 +1,7 @@
+.nyc_output/
+cache
+coverage
 lib
 node_modules
 npm-debug.log
-coverage
-cache
 yarn-error.log

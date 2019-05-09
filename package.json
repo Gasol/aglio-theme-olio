@@ -6,7 +6,7 @@
   "scripts": {
     "build": "coffeelint src/*.coffee && coffee -o lib -c src",
     "precoverage": "npm run build",
-    "coverage": "istanbul cover -x cache/*.js _mocha -- -R spec",
+    "coverage": "nyc -x cache -x '.*' mocha",
     "precoveralls": "npm run coverage",
     "coveralls": "coveralls <coverage/lcov.info",
     "pretest": "npm run build",
@@ -52,8 +52,8 @@
     "chai": "^4.2.0",
     "coffeelint": "^2.1.0",
     "coveralls": "^3.0.3",
-    "istanbul": "^0.3.6",
     "mocha": "^6.1.4",
+    "nyc": "^14.1.0",
     "rimraf": "^2.6.3"
   }
 }
