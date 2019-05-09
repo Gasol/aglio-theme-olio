@@ -1,5 +1,5 @@
 {assert} = require 'chai'
-jade = require 'jade'
+pug = require 'pug'
 rimraf = require 'rimraf'
 theme = require '../lib/main'
 
@@ -64,7 +64,7 @@ describe 'Library', ->
         done()
 
     it 'Should error on missing template', (done) ->
-      theme.render {}, themeTemplate: '/bad/path.jade', (err, html) ->
+      theme.render {}, themeTemplate: '/bad/path.pug', (err, html) ->
         assert.ok err
         done()
 

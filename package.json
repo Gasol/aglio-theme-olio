@@ -6,11 +6,11 @@
   "scripts": {
     "build": "coffeelint src/*.coffee && coffee -o lib -c src",
     "precoverage": "npm run build",
-    "coverage": "istanbul cover -x cache/*.js _mocha -- --compilers coffee:coffee-script/register -R spec",
+    "coverage": "nyc -x cache -x '.*' mocha",
     "precoveralls": "npm run coverage",
     "coveralls": "coveralls <coverage/lcov.info",
     "pretest": "npm run build",
-    "test": "mocha --compilers coffee:coffee-script/register",
+    "test": "mocha",
     "prepublish": "npm run build",
     "postinstall": "node scripts/setup-cache.js"
   },
@@ -35,25 +35,25 @@
   "homepage": "https://github.com/danielgtaylor/aglio/tree/olio-theme",
   "dependencies": {
     "@gasolwu/refract-query": "^0.1.3",
-    "coffee-script": "^1.8.0",
+    "coffeescript": "^2.4.1",
     "deep-equal": "^1.0.1",
     "highlight.js": "^8.4.0",
-    "jade": "^1.8.2",
-    "less": "^2.1.2",
-    "markdown-it": "^4.3.0",
-    "markdown-it-anchor": "^2.1.0",
+    "less": "^3.9.0",
+    "markdown-it": "^8.4.2",
+    "markdown-it-anchor": "^5.0.2",
     "markdown-it-checkbox": "^1.1.0",
-    "markdown-it-container": "^1.0.0",
-    "markdown-it-emoji": "^1.0.0",
+    "markdown-it-container": "^2.0.0",
+    "markdown-it-emoji": "^1.4.0",
     "moment": "^2.8.4",
-    "stylus": "^0.51.1"
+    "pug": "^2.0.3",
+    "stylus": "^0.54.5"
   },
   "devDependencies": {
-    "chai": "^3.0.0",
-    "coffeelint": "^1.7.1",
-    "coveralls": "^2.11.2",
-    "istanbul": "^0.3.6",
-    "mocha": "^2.0.1",
-    "rimraf": "^2.4.1"
+    "chai": "^4.2.0",
+    "coffeelint": "^2.1.0",
+    "coveralls": "^3.0.3",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.0",
+    "rimraf": "^2.6.3"
   }
 }

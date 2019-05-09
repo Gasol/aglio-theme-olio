@@ -16,10 +16,10 @@ Olio is designed from the ground up to be both **fast** and **extensible** while
 
 * [Less](http://lesscss.org/) to produce CSS
 * [Markdown-it](https://github.com/markdown-it/markdown-it#readme) to render Markdown
-* [Jade](http://jade-lang.com/) to produce HTML
+* [Pug](https://pugjs.org) to produce HTML
 * [Highlight.js](https://highlightjs.org/) to highlight code snippets
 
-For backward compatibility, Jade templates can continue to use inline Stylus and CoffeeScript.
+For backward compatibility, Pug templates can continue to use inline Stylus and CoffeeScript.
 
 ## Theme Options
 
@@ -30,7 +30,7 @@ Name           | Description
 `condense-nav` | Whether to condense nagivation for resources with only a single action (default is `true`).
 `full-width`   | Whether to use the full page width or a responsive layout (default is responsive).
 `style`        | LESS or CSS to control the layout and style of the document using the variables from below. Can be a path to your own file or one of the following presets: `default`. May be an array of paths and/or presets.
-`template`     | Jade template to render HTML. Can be a path to your own file or one of the following presets: `default`.
+`template`     | Pug template to render HTML. Can be a path to your own file or one of the following presets: `default`.
 `variables`    | LESS variables that control theme colors, fonts, and spacing. Can be a path to your own file or one of the following presets: `default`, `flatly`, `slate`, `cyborg`. May be an array of paths and/or presets.
 
 **Note**: When using this theme programmatically, these options are cased like you would expect in Javascript: `--theme-full-width` becomes `options.themeFullWidth`.

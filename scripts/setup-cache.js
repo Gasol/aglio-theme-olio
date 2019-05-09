@@ -6,7 +6,7 @@ var fs = require('fs');
 try {
   theme = require('../lib/main');
 } catch (err) {
-  require('coffee-script/register');
+  require('coffeescript/register');
   theme = require('../src/main');
 }
 

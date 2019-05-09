@@ -1,7 +1,7 @@
 crypto = require 'crypto'
 fs = require 'fs'
 hljs = require 'highlight.js'
-jade = require 'jade'
+pug = require 'pug'
 less = require 'less'
 markdownIt = require 'markdown-it'
 moment = require 'moment'
@@ -185,14 +185,14 @@ getCss = (variables, styles, verbose, done) ->
 
 compileTemplate = (filename, options) ->
   compiled = """
-    var jade = require('jade/runtime');
-    #{jade.compileFileClient filename, options}
+    var pug = require('pug');
+    #{pug.compileFileClient filename, options}
     module.exports = compiledFunc;
   """
 
 getTemplate = (name, verbose, done) ->
   # Check if this is a built-in template name
-  builtin = path.join(ROOT, 'templates', "#{name}.jade")
+  builtin = path.join(ROOT, 'templates', "#{name}.pug")
   if not fs.existsSync(name) and fs.existsSync(builtin)
     name = builtin
 
@@ -232,7 +232,7 @@ getTemplate = (name, verbose, done) ->
     # because we are compiling to a client-side template, then adding some
     # module-specific code to make it work here. This allows us to save time
     # in the future by just loading the generated javascript function.
-    benchmark.start 'jade-compile'
+    benchmark.start 'pug-compile'
     compileOptions =
       filename: name
       name: 'compiledFunc'
@@ -246,7 +246,7 @@ getTemplate = (name, verbose, done) ->
 
     if compiled.indexOf('self.') is -1
       # Not using self, so we probably need to recompile into compatibility
-      # mode. This is slower, but keeps things working with Jade files
+      # mode. This is slower, but keeps things working with Pug files
       # designed for Aglio 1.x.
       compileOptions.self = false
 
@@ -260,7 +260,7 @@ getTemplate = (name, verbose, done) ->
     catch writeErr
       return done(errMsg 'Error writing cached template file', writeErr)
 
-    benchmark.end 'jade-compile'
+    benchmark.end 'pug-compile'
 
     cache[key] = require(compiledPath)
     done null, cache[key]
@@ -687,7 +687,7 @@ getMetadata = (parseResult) ->
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
-  # complicate the Jade template should probably live here instead!
+  # complicate the Pug template should probably live here instead!
 
   # Use the slug caching mechanism
   slugify = slug.bind slug, slugCache
@@ -731,7 +731,7 @@ exports.getConfig = ->
     boolean: true, default: true}
   ]
 
-# Render the blueprint with the given options using Jade and LESS
+# Render the blueprint with the given options using Pug and LESS
 exports.render = (input, options, done) ->
   if not done?
     done = options
@@ -753,7 +753,7 @@ exports.render = (input, options, done) ->
 
   # Transform built-in layout names to paths
   if options.themeTemplate is 'default'
-    options.themeTemplate = path.join ROOT, 'templates', 'index.jade'
+    options.themeTemplate = path.join ROOT, 'templates', 'index.pug'
 
   # Setup markdown with code highlighting and smartypants. This also enables
   # automatically inserting permalinks for headers.
