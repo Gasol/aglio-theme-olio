@@ -6,11 +6,11 @@
   "scripts": {
     "build": "coffeelint src/*.coffee && coffee -o lib -c src",
     "precoverage": "npm run build",
-    "coverage": "istanbul cover -x cache/*.js _mocha -- --compilers coffee:coffeescript/register -R spec",
+    "coverage": "istanbul cover -x cache/*.js _mocha -- -R spec",
     "precoveralls": "npm run coverage",
     "coveralls": "coveralls <coverage/lcov.info",
     "pretest": "npm run build",
-    "test": "mocha --compilers coffee:coffeescript/register",
+    "test": "mocha",
     "prepublish": "npm run build",
     "postinstall": "node scripts/setup-cache.js"
   },
@@ -53,7 +53,7 @@
     "coffeelint": "^2.1.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.6",
-    "mocha": "^2.0.1",
+    "mocha": "^6.1.4",
     "rimraf": "^2.4.1"
   }
 }
