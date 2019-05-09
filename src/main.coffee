@@ -605,8 +605,6 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
 
   for actionElement in query resourceElement, {element: 'transition'}
     title = actionElement.meta.title.content
-    console.log("Generating #{title} action")
-
     method = getRequestMethod actionElement
     examples = getExamples actionElement
     for example in examples
