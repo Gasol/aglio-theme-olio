@@ -1,6 +1,6 @@
 # Aglio Default Theme
 
-[![Dependency Status](https://david-dm.org/danielgtaylor/aglio.svg)](https://david-dm.org/danielgtaylor/aglio) [![Build Status](http://img.shields.io/travis/danielgtaylor/aglio/olio-theme.svg)](https://travis-ci.org/danielgtaylor/aglio) [![Coverage Status](http://img.shields.io/coveralls/danielgtaylor/aglio/olio-theme.svg)](https://coveralls.io/r/danielgtaylor/aglio) [![NPM version](http://img.shields.io/npm/v/aglio-theme-olio.svg)](https://www.npmjs.org/package/aglio-theme-olio) [![License](http://img.shields.io/npm/l/aglio-theme-olio.svg)](https://www.npmjs.org/package/aglio-theme-olio)
+[![Dependency Status](https://david-dm.org/danielgtaylor/aglio.svg)](https://david-dm.org/danielgtaylor/aglio) [![Build Status](https://travis-ci.org/Gasol/aglio-theme-olio.svg?branch=master)](https://travis-ci.org/Gasol/aglio-theme-olio) [![Coverage Status](http://img.shields.io/coveralls/danielgtaylor/aglio/olio-theme.svg)](https://coveralls.io/r/danielgtaylor/aglio) [![NPM version](http://img.shields.io/npm/v/aglio-theme-olio.svg)](https://www.npmjs.org/package/aglio-theme-olio) [![License](http://img.shields.io/npm/l/aglio-theme-olio.svg)](https://www.npmjs.org/package/aglio-theme-olio)
 
 This is *Olio*, the default theme engine for [Aglio](https://github.com/danielgtaylor/aglio). It takes an [API Blueprint](http://apiblueprint.org/) AST and renders it into static HTML. Example use:
 
@@ -16,10 +16,10 @@ Olio is designed from the ground up to be both **fast** and **extensible** while
 
 * [Less](http://lesscss.org/) to produce CSS
 * [Markdown-it](https://github.com/markdown-it/markdown-it#readme) to render Markdown
-* [Jade](http://jade-lang.com/) to produce HTML
+* [Pug](https://pugjs.org) to produce HTML
 * [Highlight.js](https://highlightjs.org/) to highlight code snippets
 
-For backward compatibility, Jade templates can continue to use inline Stylus and CoffeeScript.
+For backward compatibility, Pug templates can continue to use inline Stylus and CoffeeScript.
 
 ## Theme Options
 
@@ -30,7 +30,7 @@ Name           | Description
 `condense-nav` | Whether to condense nagivation for resources with only a single action (default is `true`).
 `full-width`   | Whether to use the full page width or a responsive layout (default is responsive).
 `style`        | LESS or CSS to control the layout and style of the document using the variables from below. Can be a path to your own file or one of the following presets: `default`. May be an array of paths and/or presets.
-`template`     | Jade template to render HTML. Can be a path to your own file or one of the following presets: `default`.
+`template`     | Pug template to render HTML. Can be a path to your own file or one of the following presets: `default`.
 `variables`    | LESS variables that control theme colors, fonts, and spacing. Can be a path to your own file or one of the following presets: `default`, `flatly`, `slate`, `cyborg`. May be an array of paths and/or presets.
 
 **Note**: When using this theme programmatically, these options are cased like you would expect in Javascript: `--theme-full-width` becomes `options.themeFullWidth`.
