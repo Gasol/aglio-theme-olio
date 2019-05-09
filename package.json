@@ -6,11 +6,11 @@
   "scripts": {
     "build": "coffeelint src/*.coffee && coffee -o lib -c src",
     "precoverage": "npm run build",
-    "coverage": "istanbul cover -x cache/*.js _mocha -- --compilers coffee:coffee-script/register -R spec",
+    "coverage": "istanbul cover -x cache/*.js _mocha -- --compilers coffee:coffeescript/register -R spec",
     "precoveralls": "npm run coverage",
     "coveralls": "coveralls <coverage/lcov.info",
     "pretest": "npm run build",
-    "test": "mocha --compilers coffee:coffee-script/register",
+    "test": "mocha --compilers coffee:coffeescript/register",
     "prepublish": "npm run build",
     "postinstall": "node scripts/setup-cache.js"
   },
@@ -35,7 +35,7 @@
   "homepage": "https://github.com/danielgtaylor/aglio/tree/olio-theme",
   "dependencies": {
     "@gasolwu/refract-query": "^0.1.3",
-    "coffee-script": "^1.8.0",
+    "coffeescript": "^2.4.1",
     "deep-equal": "^1.0.1",
     "highlight.js": "^8.4.0",
     "less": "^2.1.2",
@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "chai": "^3.0.0",
-    "coffeelint": "^1.7.1",
+    "coffeelint": "^2.1.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.6",
     "mocha": "^2.0.1",
