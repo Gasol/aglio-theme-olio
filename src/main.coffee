@@ -427,18 +427,23 @@ getResourceGroup = (resourceGroupElement, slugCache, md) ->
     slugCache, resourceGroup
   return resourceGroup
 
+getResourceDescription = (resourceElement) ->
+  if resourceElement.content[0]?.element == 'copy'
+    return resourceElement.content[0].content
+  return ''
+
 getResources = (resourceGroupElement, slugCache, resourceGroup) ->
   slugify = slug.bind slug, slugCache
   resources = []
   for resourceElement in query resourceGroupElement, {element: 'resource'}
     title = resourceElement.meta.title.content
     title_slug = slugify "#{resourceGroup.elementId}-#{title}", true
-    [description, ...] = query resourceElement, {element: 'copy'}
+    description = getResourceDescription resourceElement
     resource = {
       name: title
       elementId: title_slug
       elementLink: "##{title_slug}"
-      description: description?.content or ''
+      description: description
       actions: []
     }
     resource.actions = getActions resourceElement, slugCache,

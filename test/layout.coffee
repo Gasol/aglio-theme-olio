@@ -93,7 +93,7 @@ describe 'Layout', ->
 
     theme.render refract, (err, html) ->
       if err then return done err
-      assert.include html, '<span class="hljs-number">1</span>'
+      assert.include html, '<span class="hljs-attribute">var a</span>'
       done()
 
   it 'Should auto-link headings in markdown', (done) ->
