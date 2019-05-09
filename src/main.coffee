@@ -627,7 +627,7 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
 
     action.parameters = getParameters actionElement, resourceElement
 
-    href = actionElement.attributes.href or resourceElement.attributes.href \
+    href = actionElement.attributes?.href or resourceElement.attributes.href \
       or {}
     uriTemplate = href.content or ''
     action.uriTemplate = modifyUriTemplate uriTemplate, action.parameters
@@ -641,7 +641,7 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
 
 getParameters = (actionElement, resourceElement) ->
   parameters = []
-  hrefVariables = actionElement.attributes.hrefVariables or {content: []}
+  hrefVariables = actionElement.attributes?.hrefVariables or {content: []}
   for hrefVariable in hrefVariables.content
     requiredElement = query hrefVariable.attributes.typeAttributes, {
       content: 'required'
