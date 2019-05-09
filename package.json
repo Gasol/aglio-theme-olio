@@ -46,7 +46,7 @@
     "markdown-it-emoji": "^1.0.0",
     "moment": "^2.8.4",
     "pug": "^2.0.3",
-    "stylus": "^0.51.1"
+    "stylus": "^0.54.5"
   },
   "devDependencies": {
     "chai": "^4.2.0",
