@@ -11,7 +11,7 @@
     "coveralls": "coveralls <coverage/lcov.info",
     "pretest": "npm run build",
     "test": "mocha",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "postinstall": "node scripts/setup-cache.js"
   },
   "repository": {
