@@ -46,6 +46,7 @@
     "markdown-it-emoji": "^1.4.0",
     "moment": "^2.8.4",
     "pug": "^2.0.3",
+    "request": "^2.88.0",
     "stylus": "^0.54.5"
   },
   "devDependencies": {
