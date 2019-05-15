@@ -445,6 +445,7 @@ getResources = (resourceGroupElement, slugCache, resourceGroup) ->
       elementLink: "##{title_slug}"
       description: description
       actions: []
+      uriTemplate: resourceElement.attributes?.href.content || ""
     }
     resource.actions = getActions resourceElement, slugCache,
       resourceGroup, resource
@@ -631,6 +632,8 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
       or {}
     uriTemplate = href.content or ''
     action.uriTemplate = modifyUriTemplate uriTemplate, action.parameters
+    action.attributes =
+      urlTemplate: action.uriTemplate
     action.colorizedUriTemplate = modifyUriTemplate uriTemplate,
       action.parameters,
       true
@@ -641,8 +644,11 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
 
 getParameters = (actionElement, resourceElement) ->
   parameters = []
-  hrefVariables = actionElement.attributes?.hrefVariables or {content: []}
-  for hrefVariable in hrefVariables.content
+  resourceParams = resourceElement.attributes?.hrefVariables?.content or []
+  actionParams = actionElement.attributes?.hrefVariables?.content or []
+  hrefVariables = resourceParams.concat actionParams
+
+  for hrefVariable in hrefVariables
     requiredElement = query hrefVariable.attributes.typeAttributes, {
       content: 'required'
     }
