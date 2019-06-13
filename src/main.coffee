@@ -423,8 +423,9 @@ getResourceGroup = (resourceGroupElement, slugCache, md) ->
     resourceGroup.navItems = slugCache._nav
     slugCache._nav = []
 
-  resourceGroup.resources = getResources resourceGroupElement,
-    slugCache, resourceGroup
+  resourceElements = query resourceGroupElement, {element: 'resource'}
+  resourceGroup.resources = getResources resourceElements, slugCache,
+    resourceGroup.elementId
   return resourceGroup
 
 getResourceDescription = (resourceElement) ->
@@ -432,25 +433,26 @@ getResourceDescription = (resourceElement) ->
     return resourceElement.content[0].content
   return ''
 
-getResources = (resourceGroupElement, slugCache, resourceGroup) ->
+getResources = (resourceElements, slugCache, parentId) ->
+  return (getResource resourceElement, slugCache, parentId \
+    for resourceElement in resourceElements)
+
+getResource = (resourceElement, slugCache, parentId) ->
   slugify = slug.bind slug, slugCache
-  resources = []
-  for resourceElement in query resourceGroupElement, {element: 'resource'}
-    title = resourceElement.meta.title.content
-    title_slug = slugify "#{resourceGroup.elementId}-#{title}", true
-    description = getResourceDescription resourceElement
-    resource = {
-      name: title
-      elementId: title_slug
-      elementLink: "##{title_slug}"
-      description: description
-      actions: []
-      uriTemplate: resourceElement.attributes?.href.content || ""
-    }
-    resource.actions = getActions resourceElement, slugCache,
-      resourceGroup, resource
-    resources.push resource
-  return resources
+  title = resourceElement.meta.title.content
+  title_slug = slugify "#{parentId}-#{title}", true
+  description = getResourceDescription resourceElement
+  resource = {
+    name: title
+    elementId: title_slug
+    elementLink: "##{title_slug}"
+    description: description
+    actions: []
+    uriTemplate: resourceElement.attributes?.href.content || ""
+  }
+  resource.actions = getActions resourceElement, slugCache,
+    "#{parentId}-#{title}-#{resource.name}"
+  return resource
 
 getHeaders = (headersElement) ->
   return ({
@@ -600,7 +602,7 @@ getRequestMethod = (actionElement) ->
     return method if method
   return ''
 
-getActions = (resourceElement, slugCache, resourceGroup, resource) ->
+getActions = (resourceElement, slugCache, parentId) ->
   slugify = slug.bind slug, slugCache
   actions = []
 
@@ -613,7 +615,7 @@ getActions = (resourceElement, slugCache, resourceGroup, resource) ->
       break if hasRequest
 
     [..., copy] = query actionElement, {element: 'copy'}
-    id = slugify "#{resourceGroup.elementId}-#{resource.name}-#{method}",
+    id = slugify "#{parentId}-#{method}",
       true
     action = {
       name: title
@@ -693,6 +695,37 @@ getMetadata = (parseResult) ->
     value: meta.content.value.content
   } for meta in category?.attributes?.metadata?.content or [])
 
+getDefaultResourceGroup = (parseResult, slugCache) ->
+  [result] = query parseResult, {
+    element: 'category',
+    meta: {
+      classes: {
+        content: [
+          {
+            content: 'api'
+          }
+        ]
+      }
+    },
+    content: [
+      {
+        element: 'resource'
+      }
+    ]
+  }
+  resourceElements = (query result, {element: 'resource'} if result) or []
+  resources = getResources resourceElements, slugCache, ''
+  if resources.length > 0
+    return {
+      name: ''
+      elementId: ''
+      elementLink: ''
+      descriptionHtml: ''
+      resources: resources
+    }
+  else
+    return null
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -718,6 +751,8 @@ decorate = (api, md, slugCache, verbose) ->
 
   api.host = getHost api
   api.resourceGroups = getResourceGroups api, slugCache, md
+  defaultResourceGroup = getDefaultResourceGroup api, slugCache
+  api.resourceGroups.unshift defaultResourceGroup if defaultResourceGroup
 
 # Get the theme's configuration, used by Aglio to present available
 # options and confirm that the input blueprint is a supported
