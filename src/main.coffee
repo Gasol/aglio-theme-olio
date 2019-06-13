@@ -693,6 +693,17 @@ getMetadata = (parseResult) ->
     value: meta.content.value.content
   } for meta in category?.attributes?.metadata?.content or [])
 
+getDefaultResourceGroup = (parseResult, slugCache) ->
+  resourceGroup = {
+    name: ''
+    elementId: ''
+    elementLink: ''
+    descriptionHtml: ''
+    resources: []
+  }
+  resourceGroup.resources = getResources parseResult, slugCache, resourceGroup
+  return resourceGroup
+
 decorate = (api, md, slugCache, verbose) ->
   # Decorate an API Blueprint AST with various pieces of information that
   # will be useful for the theme. Anything that would significantly
@@ -718,6 +729,7 @@ decorate = (api, md, slugCache, verbose) ->
 
   api.host = getHost api
   api.resourceGroups = getResourceGroups api, slugCache, md
+  api.resourceGroups.unshift getDefaultResourceGroup api, slugCache
 
 # Get the theme's configuration, used by Aglio to present available
 # options and confirm that the input blueprint is a supported
