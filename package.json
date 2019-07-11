@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/danielgtaylor/aglio/tree/olio-theme",
   "dependencies": {
-    "@gasolwu/refract-query": "^0.1.3",
+    "@gasolwu/refract-query": "^0.1.5",
     "coffeescript": "^2.4.1",
     "deep-equal": "^1.0.1",
     "highlight.js": "^9.15.6",
