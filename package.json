@@ -37,7 +37,7 @@
     "@gasolwu/refract-query": "^0.1.5",
     "coffeescript": "^2.4.1",
     "deep-equal": "^1.0.1",
-    "highlight.js": "^9.15.6",
+    "highlight.js": "^10.1.2",
     "less": "^3.9.0",
     "markdown-it": "^8.4.2",
     "markdown-it-anchor": "^5.0.2",
